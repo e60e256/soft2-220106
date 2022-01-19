@@ -19,30 +19,25 @@ double solve(const City *city, int n, int *route, int *visited)
 
 Answer search(const City *city, int n, int *route, int *visited)
 {
-    static double mindis = 10000000000;
     int start = 0;
-    double cum_dis = 0;
-    // 訪問した個数および訪問したところまでの累積距離を計算
-    int c0 = route[0];
+    // 訪問した個数を数える
     for (int i = 1; i < n ; i++){
 	if (!route[i]){
 	    start = i;
 	    break;
 	}
-	else {
-	    int c1 = route[i];
-	    cum_dis += distance(city[c0],city[c1]);
-	    c0 = c1;
-	}
     }
-    
     // 全て訪問したケース（ここが再帰の終端条件）
     if (start == 0){
-	// 個数カウント時に距離計算しているので簡略化可能
-	double sum_d = cum_dis + distance(city[c0],city[0]);
+	double sum_d = 0;
+	for (int i = 0 ; i < n ; i++){
+	    const int c0 = route[i];
+	    const int c1 = route[(i+1)%n]; // nは0に戻る
+	    sum_d += distance(city[c0],city[c1]);
+	}
 	int *retarg = (int*)malloc(sizeof(int)*n);
 	memcpy(retarg, route, sizeof(int)*n);
-	if ( sum_d < mindis ) mindis = sum_d;
+    
 	return (Answer){.dist = sum_d, .route = retarg};
     }
 
@@ -54,9 +49,6 @@ Answer search(const City *city, int n, int *route, int *visited)
 	if(!visited[i]){
 	    if(i == 2 && !visited[1]) continue; // 逆順の巡回経路を抑制
 
-	    // ここまでの累積距離が現状の最小距離を超えていたら枝刈り
-	    if ( cum_dis + distance(city[route[start-1]],city[i]) > mindis) continue;
-	    
 	    route[start] = i; 
 	    visited[i] = 1;
 	    

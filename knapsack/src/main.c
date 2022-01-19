@@ -36,11 +36,15 @@ int main (int argc, char**argv)
     print_itemset(items);
     
     // ソルバーで解く
-    double total = solve(items, W);
+    Answer total = solve(items, W);
     
     // 表示する
-    printf("----\nbest solution:\n");
-    printf("value: %4.1f\n",total);
+    printf("-----\nbest solution: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d", total.flags[i]);
+    }
+    printf("\n");
+    printf("value: %4.1f\n",total.value);
     
     free_itemset(items);
     return 0;
